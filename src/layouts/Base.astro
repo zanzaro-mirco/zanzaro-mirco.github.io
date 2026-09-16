@@ -1,0 +1,84 @@
+---
+import { locales, localeNames, useTranslations, type Locale } from '../i18n/ui';
+
+interface Props {
+  locale: Locale;
+  /** Percorso della stessa pagina in ogni lingua, es. { it: '/', en: '/en/' }. */
+  alternates: Record<Locale, string>;
+  title?: string;
+  description?: string;
+}
+
+const { locale, alternates, title, description } = Astro.props;
+const t = useTranslations(locale);
+
+const pageTitle = title ? `${title} · Mirco Zanzaro` : t('site.title');
+const pageDescription = description ?? t('site.description');
+const canonical = new URL(alternates[locale], Astro.site);
+const otherLocale = locales.find((l) => l !== locale)!;
+---
+
+<!doctype html>
+<html lang={locale}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={pageDescription} />
+    <link rel="canonical" href={canonical} />
+    {
+      locales.map((l) => (
+        <link rel="alternate" hreflang={l} href={new URL(alternates[l], Astro.site)} />
+      ))
+    }
+    <link rel="alternate" hreflang="x-default" href={new URL(alternates.it, Astro.site)} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" href="/favicon.ico" />
+    <meta name="generator" content={Astro.generator} />
+  </head>
+  <body>
+    <a class="skip-link" href="#content">{t('nav.skipToContent')}</a>
+    <header>
+      <a href={alternates[otherLocale]} hreflang={otherLocale} lang={otherLocale}>
+        {t('nav.languageSwitch')}
+        <span class="visually-hidden">({localeNames[otherLocale]})</span>
+      </a>
+    </header>
+    <main id="content">
+      <slot />
+    </main>
+    <footer>
+      <a href="https://github.com/zanzaro-mirco/zanzaro-mirco.github.io">{t('footer.source')}</a>
+    </footer>
+  </body>
+</html>
+
+<style is:global>
+  /* Stile provvisorio: il design vero arriva al passo 3. */
+  body {
+    font-family: system-ui, sans-serif;
+    margin: 0 auto;
+    max-width: 48rem;
+    padding: 0 1rem;
+  }
+
+  .skip-link {
+    position: absolute;
+    left: -9999px;
+  }
+
+  .skip-link:focus {
+    left: 1rem;
+    top: 1rem;
+  }
+
+  .visually-hidden {
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    height: 1px;
+    overflow: hidden;
+    position: absolute;
+    white-space: nowrap;
+    width: 1px;
+  }
+</style>

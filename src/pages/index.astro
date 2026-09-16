@@ -1,0 +1,11 @@
+---
+import Base from '../layouts/Base.astro';
+import { useTranslations } from '../i18n/ui';
+
+const t = useTranslations('it');
+---
+
+<Base locale="it" alternates={{ it: '/', en: '/en/' }}>
+  <h1>Mirco Zanzaro</h1>
+  <p>{t('home.role')}</p>
+</Base>
