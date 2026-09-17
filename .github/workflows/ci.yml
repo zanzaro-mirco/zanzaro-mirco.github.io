@@ -4,9 +4,15 @@ on:
   push:
     branches: [main]
   pull_request:
+  workflow_dispatch:
 
 permissions:
   contents: read
+
+# Due push ravvicinati non devono pubblicare in ordine sparso.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
   verify:
@@ -56,3 +62,31 @@ jobs:
           name: lighthouse
           path: lhci/
           if-no-files-found: ignore
+
+  # La pubblicazione parte solo dopo che tutti i controlli sono passati, e solo da main:
+  # un link rotto o un punteggio sotto soglia non arrivano online.
+  build-pages:
+    needs: verify
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Costruisci e prepara l'artefatto per Pages
+        uses: withastro/action@v6
+        with:
+          node-version: 22
+
+  deploy:
+    needs: build-pages
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Pubblica su GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5
