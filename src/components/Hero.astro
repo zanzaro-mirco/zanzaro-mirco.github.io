@@ -1,0 +1,138 @@
+---
+import { Image } from 'astro:assets';
+import portrait from '../assets/mirco-zanzaro.png';
+import Icon from './Icon.astro';
+import { homePath, profileLinks, useTranslations, type Locale } from '../i18n/ui';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = useTranslations(locale);
+---
+
+<section class="hero hero-band">
+  <div class="wrap hero-grid">
+    <div>
+      <p class="eyebrow">{t('home.eyebrow')}</p>
+      <h1>Mirco Zanzaro</h1>
+      <p class="role">{t('home.role')}</p>
+      <p class="bio">{t('home.bio')}</p>
+      <div class="actions">
+        <a class="btn btn-light" href={homePath(locale, t('anchor.projects'))}>{t('home.seeProjects')}</a>
+        <a class="btn btn-outline" href={profileLinks.linkedin}>
+          <Icon name="linkedin" /> LinkedIn
+        </a>
+        <a class="btn btn-outline" href={profileLinks.github}>
+          <Icon name="github" /> GitHub
+        </a>
+      </div>
+      <p class="domains">{t('home.domains')}</p>
+    </div>
+    <Image
+      class="photo"
+      src={portrait}
+      alt={t('home.photoAlt')}
+      widths={[128, 256, 280, 560]}
+      sizes="(min-width: 820px) 280px, 128px"
+      loading="eager"
+      fetchpriority="high"
+    />
+  </div>
+</section>
+
+<style>
+  .hero {
+    padding: 40px 0 56px;
+  }
+
+  .hero-grid {
+    display: grid;
+    gap: 20px;
+    align-items: center;
+  }
+
+  @media (min-width: 820px) {
+    .hero {
+      padding: 80px 0 88px;
+    }
+
+    .hero-grid {
+      grid-template-columns: 1fr auto;
+      gap: 56px;
+    }
+  }
+
+  .eyebrow {
+    margin: 0;
+    font-size: 13px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--hero-accent);
+    font-weight: 600;
+  }
+
+  h1 {
+    font-size: clamp(2.3rem, 6vw, 3.6rem);
+    margin: 10px 0 6px;
+    font-weight: 750;
+  }
+
+  .role {
+    font-size: 1.15rem;
+    color: var(--hero-muted);
+    margin: 0 0 22px;
+  }
+
+  .bio {
+    font-size: 1.2rem;
+    max-width: 36rem;
+    margin: 0 0 28px;
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .hero-band .btn-light {
+    background: var(--hero-text);
+    color: #0f1c2e;
+  }
+
+  .btn-outline {
+    border: 1px solid rgb(232 238 247 / 0.4);
+  }
+
+  .btn-outline:hover,
+  .btn-light:hover {
+    box-shadow: 0 0 0 2px rgb(232 238 247 / 0.5);
+  }
+
+  .domains {
+    margin: 26px 0 0;
+    font-size: 14px;
+    color: var(--hero-muted);
+  }
+
+  .photo {
+    order: -1;
+    width: 128px;
+    height: 128px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid rgb(232 238 247 / 0.9);
+    box-shadow: 0 18px 50px rgb(0 0 0 / 0.35);
+  }
+
+  @media (min-width: 820px) {
+    .photo {
+      order: 0;
+      width: 280px;
+      height: 280px;
+      border-width: 4px;
+    }
+  }
+</style>

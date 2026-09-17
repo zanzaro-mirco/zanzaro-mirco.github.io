@@ -1,0 +1,145 @@
+---
+import Base from '../layouts/Base.astro';
+import Chain from './Chain.astro';
+import Hero from './Hero.astro';
+import Icon from './Icon.astro';
+import ProjectCard from './ProjectCard.astro';
+import { profileLinks, useTranslations, type Locale } from '../i18n/ui';
+import { getProjects } from '../lib/projects';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = useTranslations(locale);
+const projects = await getProjects(locale);
+const rules = [
+  ['method.criterion', 'method.criterionText'],
+  ['method.falsify', 'method.falsifyText'],
+  ['method.limits', 'method.limitsText'],
+] as const;
+---
+
+<Base locale={locale} alternates={{ it: '/', en: '/en/' }}>
+  <Hero locale={locale} />
+  <Chain locale={locale} />
+
+  <section class="section" id={t('anchor.projects')}>
+    <div class="wrap">
+      <div class="section-head">
+        <p class="kicker">{t('projects.kicker')}</p>
+        <h2>{t('projects.title')}</h2>
+        <p>{t('projects.intro')}</p>
+      </div>
+      <div class="projects">
+        {projects.map((project) => <ProjectCard project={project} locale={locale} />)}
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id={t('anchor.method')}>
+    <div class="wrap">
+      <div class="section-head">
+        <p class="kicker">{t('method.kicker')}</p>
+        <h2>{t('method.title')}</h2>
+      </div>
+      <div class="method">
+        {
+          rules.map(([title, text]) => (
+            <div>
+              <h3>{t(title)}</h3>
+              <p>{t(text)}</p>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="kicker">{t('contact.kicker')}</p>
+        <h2>{t('contact.title')}</h2>
+        <p>{t('contact.intro')}</p>
+      </div>
+      <div class="contact-actions">
+        <a class="btn btn-accent" href={profileLinks.linkedin}>
+          <Icon name="linkedin" />
+          {t('contact.linkedin')}
+        </a>
+        <a class="btn btn-line" href={profileLinks.github}>
+          <Icon name="github" />
+          github.com/zanzaro-mirco
+        </a>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .section:target,
+  .section[id] {
+    scroll-margin-top: 16px;
+  }
+
+  .projects {
+    display: grid;
+    gap: 18px;
+  }
+
+  @media (min-width: 760px) {
+    .projects {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .method {
+    display: grid;
+    gap: 18px;
+  }
+
+  @media (min-width: 760px) {
+    .method {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  .method div {
+    border-left: 3px solid var(--accent);
+    padding: 4px 0 4px 18px;
+  }
+
+  .method h3 {
+    font-size: 1.05rem;
+    margin-bottom: 6px;
+  }
+
+  .method p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 15px;
+  }
+
+  .contact-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .btn-accent {
+    background: var(--accent);
+    color: var(--on-accent);
+  }
+
+  .btn-line {
+    border: 1px solid var(--line);
+    color: var(--text);
+  }
+
+  .btn-accent:hover,
+  .btn-line:hover {
+    box-shadow: 0 0 0 2px var(--accent-soft);
+  }
+</style>

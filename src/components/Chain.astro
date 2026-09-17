@@ -1,0 +1,280 @@
+---
+import { useTranslations, type Locale } from '../i18n/ui';
+import { projectPath } from '../lib/projects';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = useTranslations(locale);
+// Le cifre dello scontrino sono coerenti: 2,40 lordo al 10% ha 0,22 di imposta.
+const amounts = locale === 'it' ? ['1,10', '1,30', '2,40', '0,22'] : ['1.10', '1.30', '2.40', '0.22'];
+---
+
+<section class="section">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="kicker">{t('chain.kicker')}</p>
+      <h2>{t('chain.title')}</h2>
+      <p>{t('chain.intro')}</p>
+    </div>
+
+    <ol class="chain">
+      <li>
+        <a class="stage" href={projectPath(locale, 'receipt-engine')}>
+          <span class="stage-step"><b>1 · {t('chain.calculate')}</b><code>receipt_engine</code></span>
+          <span class="stage-visual" aria-hidden="true">
+            <span class="receipt">
+              <span class="row"><span>{t('chain.receiptCoffee')}</span><span>{amounts[0]}</span></span>
+              <span class="row"><span>Brioche</span><span>{amounts[1]}</span></span>
+              <span class="row tot"><span>{t('chain.receiptTotal')}</span><span>{amounts[2]}</span></span>
+              <span class="row vat"><span>{t('chain.receiptVat')}</span><span>{amounts[3]}</span></span>
+            </span>
+          </span>
+          <span class="stage-text">{t('chain.calculateText')}</span>
+        </a>
+      </li>
+      <li>
+        <a class="stage" href={projectPath(locale, 'pos-printer-bridge')}>
+          <span class="stage-step"><b>2 · {t('chain.print')}</b><code>pos_printer_bridge</code></span>
+          <span class="stage-visual" aria-hidden="true">
+            <span class="bytes">
+              <span class="cmd">1B 40</span> <span class="cmd">1B 61 01</span><br />
+              <span class="cmd">1B 45 01</span> <span class="txt">54 4F 54 41 4C 45</span><br />
+              <span class="cmd">1D 56 00</span>
+              <small>{t('chain.bytesCaption')}</small>
+            </span>
+          </span>
+          <span class="stage-text">{t('chain.printText')}</span>
+        </a>
+      </li>
+      <li>
+        <a class="stage" href={projectPath(locale, 'pos-sync')}>
+          <span class="stage-step"><b>3 · {t('chain.sync')}</b><code>pos_sync</code></span>
+          <span class="stage-visual" aria-hidden="true">
+            <svg class="lan" viewBox="0 0 230 120">
+              <rect class="dev" x="88" y="8" width="54" height="38" rx="6"></rect>
+              <circle class="lead" cx="115" cy="27" r="4"></circle>
+              <text x="115" y="60" text-anchor="middle">{t('chain.register')}</text>
+              <rect class="dev" x="10" y="74" width="46" height="32" rx="5"></rect>
+              <rect class="dev" x="92" y="74" width="46" height="32" rx="5"></rect>
+              <rect class="dev" x="174" y="74" width="46" height="32" rx="5"></rect>
+              <path class="link" d="M100 46 L40 74 M115 64 L115 74 M130 46 L190 74"></path>
+              <text x="115" y="118" text-anchor="middle">{t('chain.tablets')}</text>
+            </svg>
+          </span>
+          <span class="stage-text">{t('chain.syncText')}</span>
+        </a>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<style>
+  .chain {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 24px;
+  }
+
+  .chain li {
+    position: relative;
+    display: flex;
+  }
+
+  @media (min-width: 900px) {
+    .chain {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 34px;
+    }
+  }
+
+  /* Le frecce fra un passo e l'altro: in colonna sul telefono, in riga sul desktop. */
+  .chain li:not(:last-child)::after {
+    content: '↓';
+    position: absolute;
+    left: 50%;
+    bottom: -24px;
+    transform: translateX(-50%);
+    color: var(--muted);
+    font-size: 18px;
+    line-height: 24px;
+  }
+
+  @media (min-width: 900px) {
+    .chain li:not(:last-child)::after {
+      content: '→';
+      left: auto;
+      right: -28px;
+      bottom: auto;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 22px;
+    }
+  }
+
+  .stage {
+    flex: 1;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    text-decoration: none;
+    color: inherit;
+    transition:
+      border-color 0.15s,
+      transform 0.15s;
+  }
+
+  .stage:hover {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .stage,
+    .stage:hover {
+      transition: none;
+      transform: none;
+    }
+  }
+
+  .stage-step {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 8px;
+    flex-wrap: wrap;
+    font-size: 15px;
+  }
+
+  .stage-step code {
+    color: var(--accent);
+    font-size: 13px;
+  }
+
+  .stage-visual {
+    height: 150px;
+    border-radius: 10px;
+    background: var(--accent-soft);
+    display: grid;
+    place-items: center;
+    padding: 12px;
+    overflow: hidden;
+  }
+
+  .stage-text {
+    color: var(--muted);
+    font-size: 15px;
+  }
+
+  .receipt {
+    display: block;
+    background: var(--paper);
+    color: var(--paper-ink);
+    font-family: var(--mono);
+    font-size: 12px;
+    line-height: 1.5;
+    width: 170px;
+    padding: 10px 12px 14px;
+    box-shadow: 0 6px 18px rgb(15 27 45 / 0.15);
+    clip-path: polygon(
+      0 0,
+      100% 0,
+      100% calc(100% - 6px),
+      92% 100%,
+      84% calc(100% - 6px),
+      76% 100%,
+      68% calc(100% - 6px),
+      60% 100%,
+      52% calc(100% - 6px),
+      44% 100%,
+      36% calc(100% - 6px),
+      28% 100%,
+      20% calc(100% - 6px),
+      12% 100%,
+      4% calc(100% - 6px),
+      0 100%
+    );
+  }
+
+  .row {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .tot {
+    border-top: 1px dashed #999;
+    margin-top: 4px;
+    padding-top: 3px;
+    font-weight: 700;
+  }
+
+  .vat {
+    color: #5e5e5e;
+  }
+
+  .bytes {
+    font-family: var(--mono);
+    font-size: 13px;
+    line-height: 1.75;
+    text-align: center;
+  }
+
+  .bytes span {
+    padding: 1px 4px;
+    border-radius: 4px;
+  }
+
+  .cmd {
+    background: var(--accent);
+    color: var(--on-accent);
+  }
+
+  .txt {
+    background: var(--surface);
+    border: 1px solid var(--line);
+  }
+
+  .bytes small {
+    display: block;
+    color: var(--muted);
+    font-size: 11px;
+    margin-top: 6px;
+  }
+
+  .lan {
+    width: 100%;
+    max-width: 230px;
+  }
+
+  .lan text {
+    font-family: system-ui, sans-serif;
+    font-size: 11px;
+    fill: var(--muted);
+  }
+
+  .dev {
+    fill: var(--surface);
+    stroke: var(--accent);
+    stroke-width: 1.5;
+  }
+
+  .link {
+    stroke: var(--accent);
+    stroke-width: 1.5;
+    stroke-dasharray: 4 4;
+    fill: none;
+  }
+
+  .lead {
+    fill: var(--accent);
+  }
+</style>

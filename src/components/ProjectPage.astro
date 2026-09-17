@@ -1,9 +1,9 @@
 ---
 import { render } from 'astro:content';
 import Base from '../layouts/Base.astro';
-import { locales, useTranslations, type Locale } from '../i18n/ui';
+import { homePath, locales, useTranslations, type Locale } from '../i18n/ui';
 import { inlineCode } from '../lib/inline-code';
-import { projectPath, projectSlug, type Project } from '../lib/projects';
+import { getProjects, projectPath, projectSlug, type Project } from '../lib/projects';
 
 interface Props {
   project: Project;
@@ -26,48 +26,308 @@ const updated = data.updated.toLocaleDateString(locale, {
   year: 'numeric',
   timeZone: 'UTC',
 });
+
+// I progetti accanto nella filiera, per non dover tornare alla home a ogni pagina.
+const all = await getProjects(locale);
+const index = all.findIndex((p) => p.id === project.id);
+const previous = all[index - 1];
+const next = all[index + 1];
 ---
 
 <Base locale={locale} alternates={alternates} title={data.title} description={data.summary}>
-  <h1>{data.title}</h1>
-  <p>{data.lead}</p>
-  <ul class="stats">
-    {data.stats.map((s) => <li><b>{s.value}</b> {s.label}</li>)}
-  </ul>
+  <section class="project-hero hero-band">
+    <div class="wrap">
+      <nav aria-label={t('project.breadcrumb')}>
+        <ol class="crumbs">
+          <li><a href={homePath(locale)}>{t('project.home')}</a></li>
+          <li><a href={homePath(locale, t('anchor.projects'))}>{t('nav.projects')}</a></li>
+          <li aria-current="page">{data.title}</li>
+        </ol>
+      </nav>
+      <h1>{data.title}</h1>
+      <p class="platform">{data.platform}</p>
+      <p class="lead">{data.lead}</p>
+      <ul class="stats">
+        {data.stats.map((s) => <li><b>{s.value}</b> {s.label}</li>)}
+      </ul>
+    </div>
+  </section>
 
-  <h2>{t('project.problem')}</h2>
-  <Content />
+  <div class="wrap">
+    <div class="layout">
+      <article class="prose">
+        <h2>{t('project.problem')}</h2>
+        <Content />
 
-  <h2>{t('project.choices')}</h2>
-  {
-    data.choices.map((c) => (
-      <section class="choice">
-        <h3>{c.title}</h3>
-        <p set:html={inlineCode(c.text)} />
-      </section>
-    ))
+        <h2>{t('project.choices')}</h2>
+        {
+          data.choices.map((c) => (
+            <section class="choice">
+              <h3>{c.title}</h3>
+              <p set:html={inlineCode(c.text)} />
+            </section>
+          ))
+        }
+
+        <h2>{t('project.lesson')}</h2>
+        <blockquote>{data.lesson}</blockquote>
+
+        <h2>{t('project.limits')}</h2>
+        <ul class="limits">
+          {data.limits.map((l) => <li>{l}</li>)}
+        </ul>
+
+        {
+          (previous || next) && (
+            <nav class="pager" aria-label={t('project.otherProjects')}>
+              {previous ? (
+                <a href={projectPath(locale, projectSlug(previous))}>← {previous.data.title}</a>
+              ) : (
+                <span />
+              )}
+              {next && <a href={projectPath(locale, projectSlug(next))}>{next.data.title} →</a>}
+            </nav>
+          )
+        }
+      </article>
+
+      <aside class="aside">
+        <div class="box">
+          <h2>{t('project.links')}</h2>
+          <ul>
+            <li><a href={data.links.repository}>{t('link.repository')}</a></li>
+            <li><a href={data.links.architecture}>ARCHITECTURE.md</a></li>
+            {data.links.packages?.map((p) => <li><a href={p.url}>{p.name} {t('link.pubDev')}</a></li>)}
+            {data.links.releases && <li><a href={data.links.releases}>{t('link.releases')}</a></li>}
+          </ul>
+        </div>
+        <div class="box">
+          <h2>{t('project.stack')}</h2>
+          <ul>
+            {data.stack.map((s) => <li>{s}</li>)}
+          </ul>
+        </div>
+        <div class="box">
+          <h2>{t('project.updated')}</h2>
+          <p><time datetime={data.updated.toISOString().slice(0, 10)}>{updated}</time></p>
+        </div>
+      </aside>
+    </div>
+  </div>
+</Base>
+
+<style>
+  .project-hero {
+    padding: 36px 0 48px;
   }
 
-  <h2>{t('project.lesson')}</h2>
-  <blockquote>{data.lesson}</blockquote>
+  @media (min-width: 820px) {
+    .project-hero {
+      padding: 56px 0 64px;
+    }
+  }
 
-  <h2>{t('project.limits')}</h2>
-  <ul>
-    {data.limits.map((l) => <li>{l}</li>)}
-  </ul>
+  .crumbs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 8px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    font-size: 14px;
+    color: var(--hero-muted);
+  }
 
-  <h2>{t('project.links')}</h2>
-  <ul>
-    <li><a href={data.links.repository}>{t('link.repository')}</a></li>
-    <li><a href={data.links.architecture}>ARCHITECTURE.md</a></li>
-    {data.links.packages?.map((p) => <li><a href={p.url}>{p.name} {t('link.pubDev')}</a></li>)}
-    {data.links.releases && <li><a href={data.links.releases}>{t('link.releases')}</a></li>}
-  </ul>
+  .crumbs li:not(:last-child)::after {
+    content: '/';
+    margin-left: 8px;
+  }
 
-  <h2>{t('project.stack')}</h2>
-  <ul>
-    {data.stack.map((s) => <li>{s}</li>)}
-  </ul>
+  .crumbs a {
+    display: inline-block;
+    padding: 10px 0;
+  }
 
-  <p>{t('project.updated')} <time datetime={data.updated.toISOString().slice(0, 10)}>{updated}</time></p>
-</Base>
+  .crumbs li[aria-current] {
+    padding: 10px 0;
+  }
+
+  h1 {
+    font-family: var(--mono);
+    font-size: clamp(2rem, 5vw, 3rem);
+    margin: 10px 0 4px;
+    overflow-wrap: anywhere;
+  }
+
+  .platform {
+    margin: 0 0 16px;
+    color: var(--hero-muted);
+  }
+
+  .lead {
+    font-size: 1.2rem;
+    max-width: 40rem;
+    margin: 0 0 22px;
+  }
+
+  .project-hero .stats li {
+    background: rgb(232 238 247 / 0.12);
+    color: var(--hero-text);
+  }
+
+  .project-hero .stats b {
+    color: var(--hero-accent);
+  }
+
+  .layout {
+    display: grid;
+    gap: 40px;
+    padding: 56px 0 64px;
+  }
+
+  @media (min-width: 900px) {
+    .layout {
+      grid-template-columns: minmax(0, 1fr) 17rem;
+      gap: 64px;
+    }
+  }
+
+  .prose {
+    max-width: 42rem;
+    min-width: 0;
+  }
+
+  .prose > h2 {
+    font-size: 1.45rem;
+    margin: 44px 0 14px;
+  }
+
+  .prose > h2:first-child {
+    margin-top: 0;
+  }
+
+  .prose :global(p) {
+    margin: 0 0 14px;
+  }
+
+  .choice {
+    border: 1px solid var(--line);
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    margin-bottom: 12px;
+  }
+
+  .choice h3 {
+    font-size: 1.05rem;
+    margin-bottom: 6px;
+  }
+
+  .choice p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 15.5px;
+  }
+
+  blockquote {
+    margin: 0;
+    padding: 22px 24px;
+    border-radius: var(--radius);
+    background: var(--accent-soft);
+    font-size: 1.15rem;
+    line-height: 1.55;
+    border-left: 4px solid var(--accent);
+  }
+
+  .limits {
+    padding-left: 1.2em;
+    margin: 0;
+  }
+
+  .limits li {
+    margin-bottom: 8px;
+  }
+
+  .pager {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0 12px;
+    border-top: 1px solid var(--line);
+    margin-top: 40px;
+    padding-top: 16px;
+    font-weight: 600;
+    font-family: var(--mono);
+    font-size: 15px;
+  }
+
+  .pager a {
+    text-decoration: none;
+    padding: 10px 0;
+  }
+
+  .pager a:hover {
+    text-decoration: underline;
+  }
+
+  .aside {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    align-self: start;
+  }
+
+  @media (min-width: 900px) {
+    .aside {
+      position: sticky;
+      top: 24px;
+    }
+  }
+
+  .box {
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--surface);
+    padding: 16px 20px;
+  }
+
+  .box h2 {
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+
+  .box ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .box li {
+    padding: 6px 0;
+    border-bottom: 1px solid var(--line);
+    font-size: 15px;
+  }
+
+  .box li:last-child {
+    border-bottom: 0;
+  }
+
+  .box a {
+    display: block;
+    padding: 4px 0;
+    text-decoration: none;
+    font-weight: 600;
+  }
+
+  .box a:hover {
+    text-decoration: underline;
+  }
+
+  .box p {
+    margin: 0;
+    font-size: 15px;
+  }
+</style>

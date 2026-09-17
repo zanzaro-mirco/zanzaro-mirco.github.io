@@ -1,0 +1,57 @@
+---
+// GitHub Pages serve un solo 404.html per tutto il sito, quindi la pagina parla
+// entrambe le lingue invece di indovinare quella del visitatore.
+import Base from '../layouts/Base.astro';
+import { homePath, useTranslations } from '../i18n/ui';
+
+const it = useTranslations('it');
+const en = useTranslations('en');
+---
+
+<Base locale="it" alternates={{ it: '/', en: '/en/' }} title={it('notFound.title')}>
+  <section class="not-found hero-band">
+    <div class="wrap">
+      <p class="code">404</p>
+      <h1>{it('notFound.title')}</h1>
+      <p>{it('notFound.text')} <a href={homePath('it')}>{it('notFound.back')}</a></p>
+      <div lang="en">
+        <h2>{en('notFound.title')}</h2>
+        <p>{en('notFound.text')} <a href={homePath('en')}>{en('notFound.back')}</a></p>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .not-found {
+    padding: 72px 0 96px;
+  }
+
+  .code {
+    font-family: var(--mono);
+    color: var(--hero-accent);
+    margin: 0;
+    font-size: 1.1rem;
+  }
+
+  h1 {
+    font-size: clamp(2rem, 5vw, 3rem);
+    margin: 8px 0 12px;
+  }
+
+  h2 {
+    font-size: 1.4rem;
+    margin: 40px 0 12px;
+  }
+
+  p {
+    margin: 0;
+    font-size: 1.1rem;
+  }
+
+  a {
+    display: inline-block;
+    padding: 10px 0;
+    font-weight: 600;
+  }
+</style>
