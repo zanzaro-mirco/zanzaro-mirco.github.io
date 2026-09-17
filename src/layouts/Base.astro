@@ -112,7 +112,7 @@ const ogImage = new URL('/og-image.png', Astro.site);
     </footer>
 
     <script is:inline>
-      // L'unico JavaScript del sito: senza, il tema segue comunque il sistema.
+      // Il pulsante del tema. Senza JavaScript resta nascosto, e il tema segue il sistema.
       (() => {
         const button = document.querySelector('[data-theme-toggle]');
         if (!button) return;

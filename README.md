@@ -6,6 +6,9 @@ in un unico posto, in italiano e in inglese.
 Sito statico costruito con [Astro](https://astro.build), pubblicato su GitHub Pages
 all'indirizzo <https://zanzaro-mirco.github.io/>.
 
+Il perché delle scelte, e le semplificazioni consapevoli, sono in
+[ARCHITECTURE.md](ARCHITECTURE.md).
+
 ## Requisiti
 
 Node.js 22.12 o successivo.
@@ -43,13 +46,14 @@ integrations/
   check-links.mjs         a fine build: ogni link interno deve portare a un file e a un'ancora esistenti
 scripts/og-image.mjs      genera l'anteprima per i social da foto e testi
 lighthouserc.json         pagine misurate e soglie di Lighthouse
-.github/workflows/ci.yml  controlli, link esterni e Lighthouse a ogni push
+.github/workflows/ci.yml  controlli, link esterni, Lighthouse e, se tutto è verde, pubblicazione
 ```
 
 ## Tema
 
 Il tema scuro segue `prefers-color-scheme`, anche senza JavaScript. Il pulsante nella
-barra salva la scelta in `localStorage`, ed è l'unico script del sito. Se il browser
+barra salva la scelta in `localStorage`, e uno script in testa la applica prima del primo
+disegno: sono gli unici due script del sito. Se il browser
 blocca lo spazio di archiviazione il pulsante funziona lo stesso, ma solo fino alla
 pagina successiva.
 
