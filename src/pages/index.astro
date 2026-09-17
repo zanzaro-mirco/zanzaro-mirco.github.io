@@ -1,11 +1,18 @@
 ---
 import Base from '../layouts/Base.astro';
+import ProjectCard from '../components/ProjectCard.astro';
 import { useTranslations } from '../i18n/ui';
+import { getProjects } from '../lib/projects';
 
 const t = useTranslations('it');
+const projects = await getProjects('it');
 ---
 
 <Base locale="it" alternates={{ it: '/', en: '/en/' }}>
   <h1>Mirco Zanzaro</h1>
   <p>{t('home.role')}</p>
+  <p>{t('home.bio')}</p>
+
+  <h2>{t('home.projects')}</h2>
+  {projects.map((project) => <ProjectCard project={project} locale="it" />)}
 </Base>

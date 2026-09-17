@@ -24,8 +24,19 @@ Node.js 22.12 o successivo.
 
 ```
 src/
-  i18n/ui.ts          testi fissi dell'interfaccia, uno per lingua
-  layouts/Base.astro  scheletro HTML comune, con canonical e hreflang
-  pages/              italiano alla radice
-  pages/en/           inglese sotto /en/
+  content.config.ts       schema dei progetti: un campo mancante ferma la build
+  content/projects/it/    un Markdown per progetto, in italiano
+  components/             scheda progetto e pagina progetto
+  lib/                    percorsi e lettura dei progetti
+  i18n/ui.ts              testi fissi dell'interfaccia, uno per lingua
+  layouts/Base.astro      scheletro HTML comune, con canonical e hreflang
+  pages/                  italiano alla radice, progetti sotto /progetti/
+  pages/en/               inglese sotto /en/
 ```
+
+## Aggiungere o aggiornare un progetto
+
+Si modifica il Markdown in `src/content/projects/<lingua>/`. Nel frontmatter stanno le
+parti che la pagina mostra in blocchi: numeri, scelte, lezione, limiti e link. Il corpo è
+«il problema». I numeri in `stats` si prendono dal repository o da pub.dev, e `updated` è
+il giorno in cui sono stati verificati.

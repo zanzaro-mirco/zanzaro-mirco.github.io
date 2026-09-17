@@ -1,0 +1,73 @@
+---
+import { render } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import { locales, useTranslations, type Locale } from '../i18n/ui';
+import { inlineCode } from '../lib/inline-code';
+import { projectPath, projectSlug, type Project } from '../lib/projects';
+
+interface Props {
+  project: Project;
+  locale: Locale;
+}
+
+const { project, locale } = Astro.props;
+const { data } = project;
+const t = useTranslations(locale);
+const slug = projectSlug(project);
+const { Content } = await render(project);
+
+const alternates = Object.fromEntries(locales.map((l) => [l, projectPath(l, slug)])) as Record<
+  Locale,
+  string
+>;
+const updated = data.updated.toLocaleDateString(locale, {
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+  timeZone: 'UTC',
+});
+---
+
+<Base locale={locale} alternates={alternates} title={data.title} description={data.summary}>
+  <h1>{data.title}</h1>
+  <p>{data.lead}</p>
+  <ul class="stats">
+    {data.stats.map((s) => <li><b>{s.value}</b> {s.label}</li>)}
+  </ul>
+
+  <h2>{t('project.problem')}</h2>
+  <Content />
+
+  <h2>{t('project.choices')}</h2>
+  {
+    data.choices.map((c) => (
+      <section class="choice">
+        <h3>{c.title}</h3>
+        <p set:html={inlineCode(c.text)} />
+      </section>
+    ))
+  }
+
+  <h2>{t('project.lesson')}</h2>
+  <blockquote>{data.lesson}</blockquote>
+
+  <h2>{t('project.limits')}</h2>
+  <ul>
+    {data.limits.map((l) => <li>{l}</li>)}
+  </ul>
+
+  <h2>{t('project.links')}</h2>
+  <ul>
+    <li><a href={data.links.repository}>{t('link.repository')}</a></li>
+    <li><a href={data.links.architecture}>ARCHITECTURE.md</a></li>
+    {data.links.packages?.map((p) => <li><a href={p.url}>{p.name} {t('link.pubDev')}</a></li>)}
+    {data.links.releases && <li><a href={data.links.releases}>{t('link.releases')}</a></li>}
+  </ul>
+
+  <h2>{t('project.stack')}</h2>
+  <ul>
+    {data.stack.map((s) => <li>{s}</li>)}
+  </ul>
+
+  <p>{t('project.updated')} <time datetime={data.updated.toISOString().slice(0, 10)}>{updated}</time></p>
+</Base>
