@@ -4,7 +4,6 @@ import Icon from '../components/Icon.astro';
 import {
   homePath,
   locales,
-  localeNames,
   profileLinks,
   useTranslations,
   type Locale,
@@ -70,7 +69,7 @@ const year = new Date().getFullYear();
             href={alternates[otherLocale]}
             hreflang={otherLocale}
             lang={otherLocale}
-            aria-label={`${t('nav.languageSwitch')} (${localeNames[otherLocale]})`}
+            aria-label={t('nav.languageSwitch')}
           >
             <span>{t('nav.languageShort')}</span>
           </a>

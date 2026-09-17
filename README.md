@@ -26,6 +26,7 @@ Node.js 22.12 o successivo.
 src/
   content.config.ts       schema dei progetti: un campo mancante ferma la build
   content/projects/it/    un Markdown per progetto, in italiano
+  content/projects/en/    la stessa scheda in inglese, con lo stesso nome di file
   components/             home (apertura, filiera, schede) e pagina progetto
   assets/                 la foto, ridimensionata e convertita in WebP in build
   styles/global.css       token di colore, tema chiaro e scuro, regole comuni
@@ -33,7 +34,9 @@ src/
   i18n/ui.ts              testi fissi dell'interfaccia: una chiave senza traduzione non compila
   layouts/Base.astro      scheletro HTML comune, con canonical, hreflang e selettore del tema
   pages/                  italiano alla radice, progetti sotto /progetti/, 404 bilingue
-  pages/en/               inglese sotto /en/
+  pages/en/               inglese sotto /en/, progetti sotto /en/projects/
+integrations/
+  check-alternates.mjs    a fine build: ogni hreflang deve portare a una pagina esistente
 ```
 
 ## Tema
@@ -49,3 +52,14 @@ Si modifica il Markdown in `src/content/projects/<lingua>/`. Nel frontmatter sta
 parti che la pagina mostra in blocchi: numeri, scelte, lezione, limiti e link. Il corpo è
 «il problema». I numeri in `stats` si prendono dal repository o da pub.dev, e `updated` è
 il giorno in cui sono stati verificati.
+
+Ogni scheda esiste in tutte e due le lingue. Se ne manca una, la build fallisce e indica
+la pagina rimasta senza gemella:
+
+```
+Pagine senza la gemella nell'altra lingua:
+  /progetti/pos-sync/: hreflang="en" porta a /en/projects/pos-sync/, che non esiste
+```
+
+Il controllo legge l'HTML generato, non l'elenco dei contenuti, quindi vale per qualunque
+pagina: anche una pagina nuova scritta a mano senza la sua traduzione fa fallire la build.
