@@ -17,8 +17,10 @@ Node.js 22.12 o successivo.
 | `npm ci` | Installa le dipendenze esatte di `package-lock.json` |
 | `npm run dev` | Server di sviluppo su `http://localhost:4321` |
 | `npm run check` | Controllo dei tipi di `.astro` e `.ts` |
-| `npm run build` | Genera il sito statico in `dist/` |
+| `npm run build` | Genera il sito in `dist/` e lo controlla: traduzioni e link interni |
 | `npm run preview` | Serve `dist/` in locale |
+| `npm run lighthouse` | Misura `dist/` con Lighthouse CI, in emulazione mobile |
+| `npm run og-image` | Rigenera `public/og-image.png`, l'anteprima per i social |
 
 ## Struttura
 
@@ -35,8 +37,13 @@ src/
   layouts/Base.astro      scheletro HTML comune, con canonical, hreflang e selettore del tema
   pages/                  italiano alla radice, progetti sotto /progetti/, 404 bilingue
   pages/en/               inglese sotto /en/, progetti sotto /en/projects/
+  pages/robots.txt.ts     robots.txt, con l'indirizzo della sitemap preso da `site`
 integrations/
   check-alternates.mjs    a fine build: ogni hreflang deve portare a una pagina esistente
+  check-links.mjs         a fine build: ogni link interno deve portare a un file e a un'ancora esistenti
+scripts/og-image.mjs      genera l'anteprima per i social da foto e testi
+lighthouserc.json         pagine misurate e soglie di Lighthouse
+.github/workflows/ci.yml  controlli, link esterni e Lighthouse a ogni push
 ```
 
 ## Tema
@@ -63,3 +70,22 @@ Pagine senza la gemella nell'altra lingua:
 
 Il controllo legge l'HTML generato, non l'elenco dei contenuti, quindi vale per qualunque
 pagina: anche una pagina nuova scritta a mano senza la sua traduzione fa fallire la build.
+
+## Controlli
+
+Tre controlli fanno fallire la pipeline, e ognuno è stato messo alla prova rompendo apposta
+ciò che deve proteggere.
+
+| Controllo | Dove | Messo alla prova così |
+|---|---|---|
+| Ogni pagina ha la gemella nell'altra lingua | build | tolta una scheda inglese e una italiana: due build rosse |
+| Ogni link interno porta a un file, e ogni ancora esiste | build | un percorso sbagliato e un `id` cambiato: due build rosse |
+| Lighthouse ≥ 95 in prestazioni, accessibilità, best practice e SEO | pipeline | tolto l'`alt` alla foto: accessibilità 94, SEO 92, esecuzione rossa |
+
+Oggi le quattro pagine misurate fanno 100 in tutte e quattro le categorie. La soglia però è
+vicina al primo errore: un solo `alt` mancante porta l'accessibilità a 94. È voluto: un
+errore di accessibilità deve bastare a fermare la pipeline.
+
+I link verso altri siti li controlla [lychee](https://github.com/lycheeverse/lychee) nella
+pipeline, non la build, perché dipendono dalla rete. LinkedIn è escluso: ai client automatici
+risponde 999 anche per i profili che esistono.

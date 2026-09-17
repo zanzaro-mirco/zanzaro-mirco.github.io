@@ -1,0 +1,58 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Installa le dipendenze
+        run: npm ci
+
+      - name: Controlla i tipi
+        run: npm run check
+
+      # La build fallisce da sola se una pagina non ha la gemella nell'altra lingua
+      # o se un link interno porta a un file o a un'ancora che non esiste.
+      - name: Costruisci il sito
+        run: npm run build
+
+      # I link verso altri siti. Il sito stesso è escluso perché i suoi link li controlla
+      # già la build, e prima del primo deploy i suoi URL assoluti non rispondono.
+      # LinkedIn è escluso perché ai client automatici risponde 999 anche per profili che
+      # esistono: un controllo che fallisce sempre si impara a ignorare.
+      - name: Controlla i link esterni
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: >-
+            --no-progress
+            --root-dir ${{ github.workspace }}/dist
+            --index-files index.html
+            --exclude '^https://zanzaro-mirco\.github\.io'
+            --exclude '^https://(www\.)?linkedin\.com'
+            --max-retries 3
+            './dist/**/*.html'
+
+      - name: Misura con Lighthouse
+        run: npm run lighthouse
+
+      - name: Conserva i rapporti di Lighthouse
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: lighthouse
+          path: lhci/
+          if-no-files-found: ignore

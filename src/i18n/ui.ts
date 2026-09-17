@@ -113,7 +113,6 @@ const en: Record<UiKey, string> = {
 
   'home.eyebrow': 'Flutter · Dart · Android · Kotlin',
   'home.role': 'Mobile developer',
-  // Da rileggere al passo 4, insieme ai progetti.
   'home.bio':
     'For twelve years I have been writing software that talks to hardware: cash registers, payment terminals, fiscal printers, field handhelds. Today I do it with Flutter and Kotlin.',
   'home.seeProjects': 'See the projects',

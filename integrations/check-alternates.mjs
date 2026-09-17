@@ -1,7 +1,7 @@
 // @ts-check
-import { access, readFile } from 'node:fs/promises';
-import path from 'node:path';
+import { readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
+import { findHtml, htmlPages } from './dist-files.mjs';
 
 /**
  * A fine build legge ogni pagina generata e controlla che ogni `<link rel="alternate">`
@@ -17,15 +17,15 @@ export default function checkAlternates() {
       'astro:build:done': async ({ dir, pages, logger }) => {
         const root = fileURLToPath(dir);
         const problems = [];
+        const html = await htmlPages(root, pages);
 
-        for (const { pathname } of pages) {
-          const source = await findHtml(root, pathname);
-          if (!source) {
+        for (const { pathname, file } of html) {
+          if (!file) {
             problems.push(`/${pathname}: pagina generata ma file HTML non trovato`);
             continue;
           }
-          const html = await readFile(source, 'utf8');
-          const alternates = [...html.matchAll(/<link\b[^>]*\brel="alternate"[^>]*>/g)].map(([tag]) => ({
+          const source = await readFile(file, 'utf8');
+          const alternates = [...source.matchAll(/<link\b[^>]*\brel="alternate"[^>]*>/g)].map(([tag]) => ({
             lang: attribute(tag, 'hreflang'),
             href: attribute(tag, 'href'),
           }));
@@ -50,30 +50,10 @@ export default function checkAlternates() {
         if (problems.length > 0) {
           throw new Error(`Pagine senza la gemella nell'altra lingua:\n  ${problems.join('\n  ')}`);
         }
-        logger.info(`${pages.length} pagine, ogni hreflang porta a una pagina esistente`);
+        logger.info(`${html.length} pagine, ogni hreflang porta a una pagina esistente`);
       },
     },
   };
-}
-
-/**
- * Il file che GitHub Pages servirebbe per un percorso: `en/projects/pos-sync/` è
- * `en/projects/pos-sync/index.html`, mentre la 404 Astro la scrive come `404.html`.
- *
- * @param {string} root
- * @param {string} pathname
- * @returns {Promise<string | undefined>}
- */
-async function findHtml(root, pathname) {
-  const clean = pathname.replace(/^\/+/, '').replace(/\/+$/, '');
-  const candidates = clean.endsWith('.html')
-    ? [clean]
-    : [path.join(clean, 'index.html'), `${clean}.html`];
-  for (const candidate of candidates) {
-    const file = path.join(root, candidate);
-    if (await exists(file)) return file;
-  }
-  return undefined;
 }
 
 /**
@@ -83,17 +63,4 @@ async function findHtml(root, pathname) {
  */
 function attribute(tag, name) {
   return tag.match(new RegExp(`\\b${name}="([^"]*)"`))?.[1];
-}
-
-/**
- * @param {string} file
- * @returns {Promise<boolean>}
- */
-async function exists(file) {
-  try {
-    await access(file);
-    return true;
-  } catch {
-    return false;
-  }
 }

@@ -15,9 +15,11 @@ interface Props {
   alternates: Record<Locale, string>;
   title?: string;
   description?: string;
+  /** Per le pagine che non devono finire nei risultati di ricerca, come la 404. */
+  noindex?: boolean;
 }
 
-const { locale, alternates, title, description } = Astro.props;
+const { locale, alternates, title, description, noindex = false } = Astro.props;
 const t = useTranslations(locale);
 
 const pageTitle = title ? `${title} · Mirco Zanzaro` : t('site.title');
@@ -25,6 +27,8 @@ const pageDescription = description ?? t('site.description');
 const canonical = new URL(alternates[locale], Astro.site);
 const otherLocale = locales.find((l) => l !== locale)!;
 const year = new Date().getFullYear();
+const ogLocale: Record<Locale, string> = { it: 'it_IT', en: 'en_US' };
+const ogImage = new URL('/og-image.png', Astro.site);
 ---
 
 <!doctype html>
@@ -34,6 +38,7 @@ const year = new Date().getFullYear();
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{pageTitle}</title>
     <meta name="description" content={pageDescription} />
+    {noindex && <meta name="robots" content="noindex" />}
     <link rel="canonical" href={canonical} />
     {
       locales.map((l) => (
@@ -41,6 +46,22 @@ const year = new Date().getFullYear();
       ))
     }
     <link rel="alternate" hreflang="x-default" href={new URL(alternates.it, Astro.site)} />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+
+    <!-- Anteprima del link su LinkedIn, nelle chat e nelle mail. -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Mirco Zanzaro" />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={pageDescription} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:locale" content={ogLocale[locale]} />
+    <meta property="og:locale:alternate" content={ogLocale[otherLocale]} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={t('site.title')} />
+    <meta name="twitter:card" content="summary_large_image" />
+
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="theme-color" content="#0f1c2e" />
     <meta name="generator" content={Astro.generator} />
