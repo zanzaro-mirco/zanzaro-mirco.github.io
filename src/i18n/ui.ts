@@ -8,7 +8,7 @@ export const defaultLocale: Locale = 'it';
 const it = {
   'site.title': 'Mirco Zanzaro · Mobile developer',
   'site.description':
-    'Mobile developer: Flutter, Kotlin e periferiche POS. Quattro progetti open source, dal calcolo dello scontrino alla stampante.',
+    'Mobile developer: Flutter, Kotlin, periferiche POS e Bluetooth LE. Cinque progetti open source, dal calcolo dello scontrino alla messa in servizio di una centralina.',
 
   'nav.label': 'Principale',
   'nav.skipToContent': 'Vai al contenuto',
@@ -47,7 +47,7 @@ const it = {
   'chain.tablets': 'tablet in sala · Wi-Fi del locale',
 
   'projects.kicker': 'Progetti',
-  'projects.title': 'Quattro progetti, tutti con test e documentazione',
+  'projects.title': 'Cinque progetti, tutti con test e documentazione',
   'projects.intro':
     "Ogni repository ha un ARCHITECTURE.md che spiega le scelte, e cosa ho semplificato di proposito.",
 
@@ -98,7 +98,7 @@ export type UiKey = keyof typeof it;
 const en: Record<UiKey, string> = {
   'site.title': 'Mirco Zanzaro · Mobile developer',
   'site.description':
-    'Mobile developer: Flutter, Kotlin and POS peripherals. Four open source projects, from receipt calculation to the printer.',
+    'Mobile developer: Flutter, Kotlin, POS peripherals and Bluetooth LE. Five open source projects, from receipt calculation to commissioning a controller.',
 
   'nav.label': 'Main',
   'nav.skipToContent': 'Skip to content',
@@ -138,7 +138,7 @@ const en: Record<UiKey, string> = {
   'chain.tablets': 'dining room tablets · venue Wi-Fi',
 
   'projects.kicker': 'Projects',
-  'projects.title': 'Four projects, all with tests and documentation',
+  'projects.title': 'Five projects, all with tests and documentation',
   'projects.intro':
     'Every repository has an ARCHITECTURE.md explaining the choices, and what I simplified on purpose.',
 

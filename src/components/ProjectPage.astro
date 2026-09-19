@@ -44,7 +44,8 @@ const next = all[index + 1];
           <li aria-current="page">{data.title}</li>
         </ol>
       </nav>
-      <h1>{data.title}</h1>
+      {/* Sul telefono un nome lungo va a capo dopo un trattino basso, non a metà parola. */}
+      <h1>{data.title.split('_').map((part, i) => (i === 0 ? part : <>_<wbr />{part}</>))}</h1>
       <p class="platform">{data.platform}</p>
       <p class="lead">{data.lead}</p>
       <ul class="stats">

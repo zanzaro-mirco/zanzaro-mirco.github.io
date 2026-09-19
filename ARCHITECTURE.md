@@ -5,7 +5,7 @@ Com'è fatto, cioè cartelle e comandi, sta nel [README](README.md).
 
 ## A cosa serve
 
-Il sito mette in un unico posto i quattro progetti del portfolio, per chi seleziona
+Il sito mette in un unico posto i cinque progetti del portfolio, per chi seleziona
 candidati per un ruolo da mobile developer. Chi lo apre ha pochi minuti, spesso dal telefono,
 e deve poter verificare ciò che legge: ogni numero porta a un repository, a pub.dev o a una
 Release.

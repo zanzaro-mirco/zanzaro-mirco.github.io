@@ -93,6 +93,12 @@ const rules = [
     .projects {
       grid-template-columns: 1fr 1fr;
     }
+
+    /* Con un numero dispari di progetti l'ultimo prende tutta la riga, invece di restare
+       da solo nella colonna di sinistra. */
+    .projects > :global(:last-child:nth-child(odd)) {
+      grid-column: 1 / -1;
+    }
   }
 
   .method {

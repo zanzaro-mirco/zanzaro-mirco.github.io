@@ -1,6 +1,6 @@
 # zanzaro-mirco.github.io
 
-Il sito personale di Mirco Zanzaro, mobile developer: i quattro progetti del portfolio
+Il sito personale di Mirco Zanzaro, mobile developer: i cinque progetti del portfolio
 in un unico posto, in italiano e in inglese.
 
 Sito statico costruito con [Astro](https://astro.build), pubblicato su GitHub Pages
