@@ -3,17 +3,18 @@ title: pos_printer_bridge
 order: 2
 platform: Dart · Kotlin · Flutter plugin
 summary: >-
-  From receipt to ESC/POS bytes in pure Dart, then a platform channel to TCP and USB thermal
-  printers, with printer status delivered as events.
+  From receipt to ESC/POS bytes in pure Dart — text, barcodes and logo — then a platform
+  channel to TCP and USB thermal printers, with printer status delivered as events.
 lead: >-
   The part of the pipeline that touches hardware: a Dart package that lays the receipt out as
-  ESC/POS bytes, and a Flutter plugin that carries them to the printer over the network or USB.
+  ESC/POS bytes — barcodes and logo included — and a Flutter plugin that carries them to the
+  printer over the network or USB.
 stats:
   - value: '2'
     label: packages on pub.dev
   - value: 160/160
     label: both
-  - value: '94'
+  - value: '128'
     label: tests without a printer
 stack:
   - Dart, Flutter plugin
@@ -44,22 +45,28 @@ choices:
     text: >-
       Paper out and cover open arrive when they happen, not when asked for: they travel on an
       `EventChannel`. Native errors become a closed hierarchy.
-  - title: Byte for byte, without cheating
+  - title: The command everyone prints logos with is not used
     text: >-
-      An expectation built from the same bytes as the code is wrong whenever the code is. The
-      tests compare the stream with a hand-written document, a recorded reference, and an
-      independent decoder that reads it back.
+      `GS v 0` is in every example online, and it is also the command Epson's own reference
+      marks as obsolete, stating that future models will not support it. The logo goes through
+      the recommended graphics function instead. The price is declared: a cheap thermal printer
+      that only accepts the obsolete command will not print the logo.
 lesson: >-
   Against an emulated network printer, accented letters came out wrong: the emulator ignores
   the command that selects the character table. The bug was not in the code, and adapting to
   the emulator would have been the bug.
 limits:
   - >-
-    Not yet tested on real paper: the emulator verified the transport, not how text is encoded
-    on an actual thermal printer.
+    Not yet tested on real paper: the emulator verified the transport, not how text is encoded,
+    and not the barcodes or the logo either. The bytes match the specification, but they have
+    never come out of a printer.
   - The Kotlin code has a single automated check, building the example APK.
-  - No iOS and no Bluetooth, nor barcodes or logos.
-updated: 2026-09-17
+  - No iOS and no Bluetooth.
+  - >-
+    Four barcode systems out of fifteen, and the width is computed only for EAN13 and EAN8:
+    for CODE39 and CODE128 it depends on the printer model, and a wrong estimate would reject
+    valid codes.
+updated: 2026-10-18
 ---
 
 Calculating a receipt is not enough: sooner or later it has to be printed, and a thermal

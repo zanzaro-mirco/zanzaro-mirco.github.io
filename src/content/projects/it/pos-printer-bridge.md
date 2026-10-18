@@ -3,17 +3,18 @@ title: pos_printer_bridge
 order: 2
 platform: Dart · Kotlin · plugin Flutter
 summary: >-
-  Dallo scontrino ai byte ESC/POS in Dart puro, poi un platform channel verso stampanti
-  termiche TCP e USB, con gli stati della stampante come eventi.
+  Dallo scontrino ai byte ESC/POS in Dart puro — testo, codici a barre e logo — poi un
+  platform channel verso stampanti termiche TCP e USB, con gli stati come eventi.
 lead: >-
   Il pezzo della filiera che tocca l'hardware: un pacchetto Dart che impagina lo scontrino in
-  byte ESC/POS, e un plugin Flutter che li porta alla stampante via rete o USB.
+  byte ESC/POS — compresi i codici a barre e il logo — e un plugin Flutter che li porta alla
+  stampante via rete o USB.
 stats:
   - value: '2'
     label: pacchetti su pub.dev
   - value: 160/160
     label: entrambi
-  - value: '94'
+  - value: '128'
     label: test senza stampante
 stack:
   - Dart, plugin Flutter
@@ -44,22 +45,28 @@ choices:
     text: >-
       Carta finita e coperchio aperto arrivano quando capitano, non quando li si chiede:
       viaggiano su un `EventChannel`. Gli errori nativi diventano una gerarchia chiusa.
-  - title: Byte per byte, senza barare
+  - title: Il comando con cui tutti stampano il logo non si usa
     text: >-
-      Un'attesa costruita con gli stessi byte del codice sbaglia insieme a lui. I test
-      confrontano il flusso con un documento scritto a mano, con un riferimento registrato e
-      con un decodificatore indipendente che lo rilegge.
+      `GS v 0` è in ogni esempio in rete, ed è anche il comando che il riferimento di Epson
+      marca come obsoleto, scrivendo che i modelli futuri non lo supporteranno. Il logo passa
+      dalla funzione grafica consigliata. Il prezzo è dichiarato: una termica economica che
+      accetti solo il comando obsoleto non stampa il logo.
 lesson: >-
   Contro una stampante di rete emulata il testo usciva con gli accenti sbagliati: l'emulatore
   ignora il comando che sceglie la tabella dei caratteri. Il difetto non era nel codice, e
   adeguarsi all'emulatore sarebbe stato il difetto.
 limits:
   - >-
-    Manca la prova su carta: l'emulatore ha verificato il trasporto, non la codifica del testo
-    su una stampante termica reale.
+    Manca la prova su carta: l'emulatore ha verificato il trasporto, non la codifica del testo,
+    e nemmeno i codici a barre o il logo. I byte sono quelli della specifica, ma non sono mai
+    usciti da una stampante.
   - Il codice Kotlin ha una sola verifica automatica, la compilazione dell'APK di esempio.
-  - Niente iOS e niente Bluetooth, né codici a barre o logo.
-updated: 2026-09-17
+  - Niente iOS e niente Bluetooth.
+  - >-
+    Quattro sistemi di codice a barre su quindici, e la larghezza calcolata solo per EAN13 ed
+    EAN8: per CODE39 e CODE128 dipende dal modello di stampante, e una stima sbagliata
+    rifiuterebbe codici buoni.
+updated: 2026-10-18
 ---
 
 Calcolare uno scontrino non basta: prima o poi va stampato, e una stampante termica non
