@@ -14,7 +14,7 @@ stats:
     label: packages on pub.dev
   - value: 160/160
     label: both
-  - value: '128'
+  - value: '131'
     label: tests without a printer
 stack:
   - Dart, Flutter plugin
