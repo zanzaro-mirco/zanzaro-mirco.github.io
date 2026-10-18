@@ -10,7 +10,7 @@ lead: >-
   offline, scritta come si scrive Android oggi: Compose, coroutine, stato come gerarchia
   chiusa.
 stats:
-  - value: '108'
+  - value: '122'
     label: test in CI
   - value: '8'
     label: stati verificati per l'accessibilità
@@ -19,7 +19,7 @@ stats:
 stack:
   - Kotlin, Jetpack Compose, Navigation
   - Room, Retrofit, kotlinx-serialization
-  - Hilt
+  - Hilt, WorkManager
   - Robolectric, Roborazzi, Turbine
   - Macrobenchmark e Baseline Profile
 links:
@@ -31,7 +31,8 @@ choices:
     text: >-
       La UI legge sempre da Room, e la rete si limita ad aggiornarlo. Nella presentazione non
       c'è un solo `if (isOnline)`. Se la sincronizzazione fallisce la cache non si tocca, e un
-      errore di rete su dati già scaricati diventa un avviso sopra la lista.
+      errore di rete su dati già scaricati diventa un avviso sopra la lista. Quando la rete
+      torna, WorkManager recupera da solo la sincronizzazione mancata, anche ad app chiusa.
   - title: Dati veri, con le loro imperfezioni
     text: >-
       L'app legge le issue pubbliche di GitHub invece di un JSON inventato. Il mapper deve
@@ -62,7 +63,11 @@ limits:
     Il Baseline Profile non ha dato guadagni oltre il rumore su un Galaxy S20, e su un telefono
     di fascia bassa non è stato misurato.
   - La navigazione nell'APK offuscato non è stata verificata su un dispositivo.
-updated: 2026-09-17
+  - >-
+    La sincronizzazione che riparte quando torna la rete è verificata in test, su un
+    WorkManager simulato: che il telefono svegli davvero l'app chiusa non è ancora stato
+    osservato.
+updated: 2026-10-18
 ---
 
 Chi lavora fuori sede consulta i rapporti di intervento su dispositivi spesso lenti, con una

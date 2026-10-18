@@ -9,7 +9,7 @@ lead: >-
   A deliberately small Android app for reading field service reports, offline too, written the
   way Android is written today: Compose, coroutines, state as a closed hierarchy.
 stats:
-  - value: '108'
+  - value: '122'
     label: tests in CI
   - value: '8'
     label: states checked for accessibility
@@ -18,7 +18,7 @@ stats:
 stack:
   - Kotlin, Jetpack Compose, Navigation
   - Room, Retrofit, kotlinx-serialization
-  - Hilt
+  - Hilt, WorkManager
   - Robolectric, Roborazzi, Turbine
   - Macrobenchmark and Baseline Profile
 links:
@@ -30,7 +30,9 @@ choices:
     text: >-
       The UI always reads from Room, and the network only updates it. There is not a single
       `if (isOnline)` in the presentation layer. If a sync fails the cache is left untouched,
-      and a network error on data already downloaded becomes a notice above the list.
+      and a network error on data already downloaded becomes a notice above the list. When
+      the network comes back, WorkManager makes up the missed sync on its own, even with the
+      app closed.
   - title: Real data, with its flaws
     text: >-
       The app reads public GitHub issues instead of made-up JSON. The mapper has to drop pull
@@ -60,7 +62,10 @@ limits:
     The Baseline Profile gave no gains beyond noise on a Galaxy S20, and it has not been
     measured on a low-end phone.
   - Navigation in the obfuscated APK has not been verified on a device.
-updated: 2026-09-17
+  - >-
+    The sync that resumes when the network comes back is verified in tests, on a simulated
+    WorkManager: that the phone really wakes the closed app has not been observed yet.
+updated: 2026-10-18
 ---
 
 People working off-site read service reports on devices that are often slow, with patchy
