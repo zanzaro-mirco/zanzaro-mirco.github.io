@@ -13,7 +13,7 @@ stats:
   - value: '2'
     label: pacchetti su pub.dev
   - value: 160/160
-    label: entrambi
+    label: su pub.dev, entrambi
   - value: '131'
     label: test senza stampante
 stack:

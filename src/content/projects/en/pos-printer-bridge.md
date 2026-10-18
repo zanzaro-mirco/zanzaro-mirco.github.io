@@ -13,7 +13,7 @@ stats:
   - value: '2'
     label: packages on pub.dev
   - value: 160/160
-    label: both
+    label: on pub.dev, both
   - value: '131'
     label: tests without a printer
 stack:
@@ -45,7 +45,7 @@ choices:
     text: >-
       Paper out and cover open arrive when they happen, not when asked for: they travel on an
       `EventChannel`. Native errors become a closed hierarchy.
-  - title: The command everyone prints logos with is not used
+  - title: The command everyone prints logos with goes unused
     text: >-
       `GS v 0` is in every example online, and it is also the command Epson's own reference
       marks as obsolete, stating that future models will not support it. The logo goes through
